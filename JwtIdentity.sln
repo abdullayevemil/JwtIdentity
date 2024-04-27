@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{45696F35-6311-4767-AE40-C60CD3561B8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtIdentity", "src\JwtIdentity\JwtIdentity.csproj", "{EF77D887-5DFF-45CA-A351-15DA3DADE758}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{D71F2638-56A0-4046-B74F-D0514D69CCCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtIdentityUnitTests", "UnitTests\JwtIdentityUnitTests\JwtIdentityUnitTests.csproj", "{B22D08A1-F4BC-4D88-8B14-0F5F2C3EBA03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF77D887-5DFF-45CA-A351-15DA3DADE758}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF77D887-5DFF-45CA-A351-15DA3DADE758}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF77D887-5DFF-45CA-A351-15DA3DADE758}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF77D887-5DFF-45CA-A351-15DA3DADE758}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B22D08A1-F4BC-4D88-8B14-0F5F2C3EBA03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B22D08A1-F4BC-4D88-8B14-0F5F2C3EBA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B22D08A1-F4BC-4D88-8B14-0F5F2C3EBA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B22D08A1-F4BC-4D88-8B14-0F5F2C3EBA03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EF77D887-5DFF-45CA-A351-15DA3DADE758} = {45696F35-6311-4767-AE40-C60CD3561B8E}
+		{B22D08A1-F4BC-4D88-8B14-0F5F2C3EBA03} = {D71F2638-56A0-4046-B74F-D0514D69CCCD}
+	EndGlobalSection
+EndGlobal
