@@ -59,7 +59,7 @@ public class IdentityController : ControllerBase
 
         var roles = await userManager.GetRolesAsync(user);
 
-        if (roles.Select(role => role) == loginDto.Roles!.Select(role => role))
+        if (roles.Contains(loginDto.Roles.FirstOrDefault()) == false)
         {
             return base.BadRequest("Incorrect email or password");
         }

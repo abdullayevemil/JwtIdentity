@@ -37,6 +37,26 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(jwtOptions.KeyInBytes),
+
+            ValidateLifetime = true,
+
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+
+            ValidateIssuer = true,
+            ValidIssuers = jwtOptions.Issuers,
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddSwaggerGen(options =>
 {
     const string scheme = "Bearer";
@@ -72,26 +92,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     );
 });
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(jwtOptions.KeyInBytes),
-
-            ValidateLifetime = true,
-
-            ValidateAudience = true,
-            ValidAudience = jwtOptions.Audience,
-
-            ValidateIssuer = true,
-            ValidIssuers = jwtOptions.Issuers,
-        };
-    });
-
-builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("BlazorWasmPolicy", corsBuilder => {
