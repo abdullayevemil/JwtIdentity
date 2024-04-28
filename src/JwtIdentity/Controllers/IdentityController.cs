@@ -6,7 +6,9 @@ using JwtIdentity.Data;
 using JwtIdentity.Dtos;
 using JwtIdentity.Models;
 using JwtIdentity.Options;
+using JwtIdentity.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,12 +24,15 @@ public class IdentityController : ControllerBase
     private readonly SignInManager<User> signInManager;
     private readonly UserManager<User> userManager;
     private readonly JwtIdentityDbContext dbContext;
+    private readonly MailService mailService;
+    private readonly IDataProtector dataProtector;
 
     public IdentityController(
         IOptionsSnapshot<JwtOptions> jwtOptions,
         SignInManager<User> signInManager,
         UserManager<User> userManager,
-        JwtIdentityDbContext dbContext)
+        JwtIdentityDbContext dbContext,
+        IDataProtectionProvider dataProtectionProvider)
     {
         this.signInManager = signInManager;
 
@@ -36,6 +41,10 @@ public class IdentityController : ControllerBase
         this.dbContext = dbContext;
 
         this.jwtOptions = jwtOptions.Value;
+
+        this.mailService = new MailService();
+
+        this.dataProtector = dataProtectionProvider.CreateProtector("4FitBodyIdentity");
     }
 
     [HttpPost]
@@ -45,10 +54,14 @@ public class IdentityController : ControllerBase
 
         if (user is null)
         {
-            return base.BadRequest(new
-            {
-                Message = "Incorrect email or password!",
-            });
+            return base.BadRequest("Incorrect email or password");
+        }
+
+        var roles = await userManager.GetRolesAsync(user);
+
+        if (roles.Select(role => role) == loginDto.Roles!.Select(role => role))
+        {
+            return base.BadRequest("Incorrect email or password");
         }
 
         var signInResult = await this.signInManager.PasswordSignInAsync(user, loginDto.Password!, false, true);
@@ -69,8 +82,6 @@ public class IdentityController : ControllerBase
             });
         }
 
-        var roles = await userManager.GetRolesAsync(user);
-
         var claims = roles
             .Select(role => new Claim(ClaimTypes.Role, role))
             .Append(new Claim(ClaimTypes.Email, loginDto.Email!))
@@ -78,8 +89,6 @@ public class IdentityController : ControllerBase
             .Append(new Claim(ClaimTypes.Surname, user.Surname!))
             .Append(new Claim("Age", user.Age.ToString()!))
             .Append(new Claim(ClaimTypes.NameIdentifier, user.Id));
-
-        await userManager.AddToRolesAsync(user!, roles);
 
         var securityKey = new SymmetricSecurityKey(this.jwtOptions.KeyInBytes);
 
@@ -117,14 +126,20 @@ public class IdentityController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RegistrationAsync(RegistrationDto registrationDto)
     {
+        var originalOtp = this.dataProtector.Unprotect(registrationDto.OriginalOTP!);
+
+        if (originalOtp != registrationDto.OTP)
+        {
+            return base.BadRequest($"Wrong otp code was entered.");
+        }
+
         var user = await this.userManager.FindByEmailAsync(registrationDto.Email!);
 
         if (user is not null)
         {
-            return base.BadRequest($"Email {registrationDto.Email} is in use!");
+            return base.BadRequest($"Email {registrationDto.Email} is in use.");
         }
 
         var newUser = new User
@@ -237,5 +252,15 @@ public class IdentityController : ControllerBase
             accessToken = newJwt,
             refreshToken = refreshTokenToChange.Token
         });
+    }
+
+    [HttpPost]
+    public IActionResult SendVerificationEmail(string email)
+    {
+        var otp = this.mailService.SendVerification("abdullayevemil27042006@gmail.com", "seic fcmj pxmw tizb", email, "google.com");
+
+        var protectedOtp = this.dataProtector.Protect(otp);
+
+        return base.Ok(protectedOtp);
     }
 }
