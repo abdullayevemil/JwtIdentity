@@ -96,8 +96,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddCors(options => {
     options.AddPolicy("BlazorWasmPolicy", corsBuilder => {
         corsBuilder
-            .WithOrigins("http://localhost:5160")
-            .WithOrigins("http://localhost:5141")
+            .WithOrigins("http://localhost:5160", "http://localhost:5141")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -113,6 +112,8 @@ using (var scope = app.Services.CreateScope()) {
     await dbContext.Database.EnsureCreatedAsync();
 
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await roleManager.CreateAsync(new IdentityRole(DefaultRoles.User.ToString()));
 
     await roleManager.CreateAsync(new IdentityRole(DefaultRoles.Admin.ToString()));
     
