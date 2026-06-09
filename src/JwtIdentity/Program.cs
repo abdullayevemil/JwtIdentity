@@ -2,6 +2,7 @@ using System.Reflection;
 using JwtIdentity.Data;
 using JwtIdentity.Models;
 using JwtIdentity.Options;
+using JwtIdentity.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 var jwtOptionsSection = builder.Configuration.GetSection("JwtOptions");
 
 var jwtOptions = jwtOptionsSection.Get<JwtOptions>() ?? throw new Exception("Couldn't create jwt options object");
@@ -17,6 +19,8 @@ var jwtOptions = jwtOptionsSection.Get<JwtOptions>() ?? throw new Exception("Cou
 builder.Services.Configure<JwtOptions>(jwtOptionsSection);
 
 builder.Services.AddAuthorization();
+
+builder.Configuration.AddJsonFile("appsettings.Secrets.json", optional: true);
 
 var connectionString = builder.Configuration.GetConnectionString("FitnessDb");
 
@@ -27,6 +31,10 @@ builder.Services.AddDbContext<JwtIdentityDbContext>(dbContextOptionsBuilder =>
         o.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
     });
 });
+builder.Services.Configure<MailSettings>(
+    builder.Configuration.GetSection("MailSettings"));
+
+builder.Services.AddScoped<MailService>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options => {
     options.Password.RequireNonAlphanumeric = true;
@@ -96,7 +104,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddCors(options => {
     options.AddPolicy("BlazorWasmPolicy", corsBuilder => {
         corsBuilder
-            .WithOrigins("http://localhost:5160", "http://localhost:5141")
+            .WithOrigins("http://localhost:5160", "http://localhost:5141","http://127.0.0.1:5501","http://127.0.0.1:5501/register.html")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -146,12 +154,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("BlazorWasmPolicy");
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
+
 app.MapControllers();
 
-app.UseCors("BlazorWasmPolicy");
 
 app.Run();

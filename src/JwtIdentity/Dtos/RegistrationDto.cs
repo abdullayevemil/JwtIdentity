@@ -10,4 +10,7 @@ public class RegistrationDto
     public IEnumerable<string>? Roles { get; set; }
     public string? OTP { get; set; }
     public string? OriginalOTP { get; set; }
+
+    public string? PhoneNumber { get; set; }
+    public string? Address { get; set; }
 }
