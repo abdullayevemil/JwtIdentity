@@ -104,7 +104,13 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddCors(options => {
     options.AddPolicy("BlazorWasmPolicy", corsBuilder => {
         corsBuilder
-            .WithOrigins("http://localhost:5160", "http://localhost:5141","http://127.0.0.1:5501","http://127.0.0.1:5501/register.html")
+            .WithOrigins(
+                "http://localhost:5160",
+                "http://localhost:5141",
+                "http://127.0.0.1:5501",
+                "https://itarla.com",
+                "https://www.itarla.com"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -152,7 +158,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("BlazorWasmPolicy");
 
