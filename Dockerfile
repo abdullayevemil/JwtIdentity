@@ -4,14 +4,16 @@ WORKDIR /src
 
 COPY . .
 
-RUN dotnet publish -c Release -o dist
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/dist
 
 
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim-amd64 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 WORKDIR /app
 
-COPY --from=build /src/dist .
+COPY --from=build /app/dist .
+
+EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "JwtIdentity.dll"]
